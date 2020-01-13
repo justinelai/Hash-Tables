@@ -1,3 +1,4 @@
+
 # '''
 # Linked List hash table key/value pair
 # '''
@@ -18,11 +19,6 @@ class HashTable:
 
 
     def _hash(self, key):
-        '''
-        Hash an arbitrary key and return an integer.
-
-        You may replace the Python hash with DJB2 as a stretch goal.
-        '''
         return hash(key)
 
 
@@ -51,7 +47,19 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        hashIndex = self._hash_mod(key)
+        current = self.storage[hashIndex]
+        while current:
+            if current.key == key:
+                current.value = value
+                return
+            elif current.next: 
+                current = current.next
+            else: 
+                current.next = LinkedPair(key, value)
+                return
+
+        self.storage[hashIndex] = LinkedPair(key,value)
 
 
 
@@ -74,7 +82,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        hashIndex = self._hash_mod(key)
+        current = self.storage[hashIndex]
+        if current:
+            while current:
+                if current.key == key:
+                    return current.value
+                else: 
+                    current = current.next
+        else: return None
+
 
 
     def resize(self):
