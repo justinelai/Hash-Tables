@@ -69,13 +69,6 @@ class HashTable:
             return None
 
     def retrieve(self, key):
-        '''
-        Retrieve the value stored with the given key.
-
-        Returns None if the key is not found.
-
-        Fill this in.
-        '''
         hashIndex = self._hash_mod(key)
         current = self.storage[hashIndex]
         if current:
@@ -95,8 +88,14 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        self.capacity = 2 * self.capacity
+        prevStorage = self.storage
+        self.storage =  [None] * self.capacity
+        for i in prevStorage:
+            while i:
+                self.insert(i.key, i.value)
+                i = i.next
+        return
 
 
 if __name__ == "__main__":
