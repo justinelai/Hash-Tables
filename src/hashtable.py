@@ -32,21 +32,10 @@ class HashTable:
 
 
     def _hash_mod(self, key):
-        '''
-        Take an arbitrary key and return a valid integer index
-        within the storage capacity of the hash table.
-        '''
         return self._hash(key) % self.capacity
 
 
     def insert(self, key, value):
-        '''
-        Store the value with the given key.
-
-        Hash collisions should be handled with Linked List Chaining.
-
-        Fill this in.
-        '''
         hashIndex = self._hash_mod(key)
         current = self.storage[hashIndex]
         while current:
@@ -64,15 +53,20 @@ class HashTable:
 
 
     def remove(self, key):
-        '''
-        Remove the value stored with the given key.
-
-        Print a warning if the key is not found.
-
-        Fill this in.
-        '''
-        pass
-
+        hashIndex = self._hash_mod(key)
+        current = self.storage[hashIndex]
+        if current.key == key:
+            self.storage[hashIndex] = current.next
+            return
+        while current:
+            prev = current
+            current = current.next
+            if current.key == key:
+                prev.next = current.next
+                return
+        else: 
+            print("Warning! Key not found")
+            return None
 
     def retrieve(self, key):
         '''
