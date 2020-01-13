@@ -9,10 +9,6 @@ class LinkedPair:
         self.next = None
 
 class HashTable:
-    '''
-    A hash table that with `capacity` buckets
-    that accepts string keys
-    '''
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
@@ -28,11 +24,14 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
 
     def _hash_mod(self, key):
-        return self._hash(key) % self.capacity
+        return self._hash_djb2(key) % self.capacity
 
 
     def insert(self, key, value):
@@ -82,12 +81,6 @@ class HashTable:
 
 
     def resize(self):
-        '''
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
-
-        Fill this in.
-        '''
         self.capacity = 2 * self.capacity
         prevStorage = self.storage
         self.storage =  [None] * self.capacity
