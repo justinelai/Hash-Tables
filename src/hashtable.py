@@ -1,3 +1,4 @@
+
 # '''
 # Linked List hash table key/value pair
 # '''
@@ -8,21 +9,13 @@ class LinkedPair:
         self.next = None
 
 class HashTable:
-    '''
-    A hash table that with `capacity` buckets
-    that accepts string keys
-    '''
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
-
+        self.count = 0
+        self.doubled = False
 
     def _hash(self, key):
-        '''
-        Hash an arbitrary key and return an integer.
-
-        You may replace the Python hash with DJB2 as a stretch goal.
-        '''
         return hash(key)
 
 
@@ -32,61 +25,88 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
 
     def _hash_mod(self, key):
-        '''
-        Take an arbitrary key and return a valid integer index
-        within the storage capacity of the hash table.
-        '''
-        return self._hash(key) % self.capacity
+        return self._hash_djb2(key) % self.capacity
 
+    def _load_factor(self):
+        load = self.count / self.capacity
+        if load >= 0.7:
+            self.doubled = True
+            self.resize(2)
+            print("Doubled!")
+        elif load <= 0.2 and self.doubled == True:
+            self.resize(0.5)
+            self.doubled = False
+            print("Shrinkage!")
+        else: 
+            pass 
 
     def insert(self, key, value):
-        '''
-        Store the value with the given key.
-
-        Hash collisions should be handled with Linked List Chaining.
-
-        Fill this in.
-        '''
-        pass
-
-
-
+        hashIndex = self._hash_mod(key)
+        current = self.storage[hashIndex]
+        if current is None:
+            self.storage[hashIndex] = LinkedPair(key,value)
+            if self.doubled == True: return
+        else:
+            if current.key == key:
+                current.value = value
+                return
+            elif current.next: 
+                current = current.next
+            else: 
+                current.next = LinkedPair(key, value)
+                if self.doubled == True: return
+        self.count += 1
+        self._load_factor()
+        
     def remove(self, key):
-        '''
-        Remove the value stored with the given key.
-
-        Print a warning if the key is not found.
-
-        Fill this in.
-        '''
-        pass
-
+        hashIndex = self._hash_mod(key)
+        current = self.storage[hashIndex]
+        if current.key == key:
+            self.storage[hashIndex] = current.next
+            self.count -= 1
+            self._load_factor()
+            return
+        while current:
+            prev = current
+            current = current.next
+            if current.key == key:
+                prev.next = current.next
+                self.count -= 1
+                self._load_factor()
+        else: 
+            print("Warning! Key not found")
+            return None
 
     def retrieve(self, key):
-        '''
-        Retrieve the value stored with the given key.
-
-        Returns None if the key is not found.
-
-        Fill this in.
-        '''
-        pass
-
-
-    def resize(self):
-        '''
-        Doubles the capacity of the hash table and
-        rehash all key/value pairs.
-
-        Fill this in.
-        '''
-        pass
+        hashIndex = self._hash_mod(key)
+        current = self.storage[hashIndex]
+        if current:
+            while current:
+                if current.key == key:
+                    return current.value
+                else: 
+                    current = current.next
+        else: return None
 
 
+    def resize(self, factor):
+        prevStorage = self.storage
+        freezeCount = self.count
+        self.capacity = int(factor * self.capacity)
+        self.storage = [None] * self.capacity
+        for i in prevStorage:
+            while i:
+                self.insert(i.key, i.value)
+                i = i.next
+        self.count = freezeCount
+        return
 
 if __name__ == "__main__":
     ht = HashTable(2)
